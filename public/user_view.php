@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <h1>Submit Your Information</h1>
-    <form method="POST">
+    <form id="user-view-form" method="POST">
         <label>Name: <input type="text" name="name" required></label><br>
         <label>Email: <input type="email" name="email" required></label><br>
         <label>Phone: <input type="text" name="phone" required></label><br>

@@ -48,18 +48,20 @@ while (true) {
 
         handshake($header, $new_connection, $address, $port);
         $connections[] = $new_connection;
-        $reply = [
-            "type" => "join",
-            "sender" => "Server",
-            "text" => "Enter name to join...\n"
-        ];
-        $reply = pack_data(json_encode($reply));
-        socket_write($new_connection, $reply, strlen($reply));
+        // $reply = [
+        //     "type" => "join",
+        //     "sender" => "Server",
+        //     "text" => "Enter name to join...\n"
+        // ];
+        // $reply = pack_data(json_encode($reply));
+        // socket_write($new_connection, $reply, strlen($reply));
         $firstIndex = array_search($sock, $reads);
         unset($reads[$firstIndex]);
     }
 
     foreach ($reads as $key => $value) {
+        echo "reading...\n";
+
         $data = @socket_read($value, 1024);
 
         if ($data === false) {
@@ -76,14 +78,20 @@ while (true) {
             $decoded_message = json_decode($message, true);
             if ($decoded_message) {
                 if (isset($decoded_message['text'])) {
-                    if ($decoded_message['type'] === 'join') {
-                        $members[$key] = [
-                            'name' => $decoded_message['sender'],
-                            'connection' => $value
-                        ];
-                    }
+                    echo "message: " . $decoded_message['text'] . "\n";
+                    // if ($decoded_message['type'] === 'join') {
+                    //     $members[$key] = [
+                    //         'name' => $decoded_message['sender'],
+                    //         'connection' => $value
+                    //     ];
+                    // }
                     $maskedMessage = pack_data($message);
+
+                    echo '$members ' . json_encode($members) . "\n";
+
                     foreach ($members as $mkey => $mvalue) {
+                        echo "sending to " . $mvalue['name'] . "\n";
+
                         socket_write($mvalue['connection'], $maskedMessage, strlen($maskedMessage));
                     }
                 }

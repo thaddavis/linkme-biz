@@ -15,6 +15,8 @@
   }
 
   function appendMessage(message) {
+
+      debugger
       
       var parsedMsg;
       var msgContainer = document.querySelector(".messages");
@@ -70,32 +72,11 @@
           closeForm.classList.remove('hidden');
       }
   
-      joinForm.addEventListener('submit', joinFormSubmit);
-  
-      function msgFormSubmit(event) {
-          event.preventDefault();
-          var msgField, msgText, msg;
-          msgField = document.getElementById('msg');
-          msgText = msgField.value;
-          msg = {
-              type: "normal",
-              sender: sender,
-              text: msgText
-          };
-          msg = JSON.stringify(msg);
-          sendMessage(msg);
-          msgField.value = '';
-      }
-  
-      msgForm.addEventListener('submit', msgFormSubmit);
-
       function closeFormSubmit(event) {
           event.preventDefault();
           socket.close();
           window.location.reload();
       }
-
-      closeForm.addEventListener('submit', closeFormSubmit);
   }
 
   let socket = new WebSocket("ws://localhost:8910");

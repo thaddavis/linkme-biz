@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -25,5 +25,22 @@
         </div>
     </div>
     <script src="main.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User View</title>
+</head>
+<body>
+    <h1>Submit Your Information</h1>
+    <form method="POST">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>Email: <input type="email" name="email" required></label><br>
+        <label>Phone: <input type="text" name="phone" required></label><br>
+        <button type="submit">Submit</button>
+    </form>
+    <script src="user_view.js"></script>
 </body>
 </html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Real-time View</title>
+    <script>
+        let socket;
+        window.onload = function() {
+            socket = new WebSocket('ws://0.0.0.0:12345');
+
+            socket.onopen = function(event) {
+                console.log('WebSocket connection opened:', event);
+            };
+
+            socket.onmessage = function(event) {
+                console.log('Message received from server:', event.data);
+                let msg = JSON.parse(event.data);
+                if (msg.type === 'message') {
+                    let data = JSON.parse(msg.text);
+                    let listItem = document.createElement('li');
+                    listItem.textContent = `Link: ${data.link}, Name: ${data.name}, Email: ${data.email}, Phone: ${data.phone}`;
+                    document.getElementById('submissions').appendChild(listItem);
+                }
+            };
+
+            socket.onclose = function(event) {
+                console.log('WebSocket connection closed:', event);
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket error: ', error);
+            };
+        };
+    </script>
+</head>
+<body>
+    <h1>Real-time Submissions</h1>
+    <ul id="submissions"></ul>
+</body>
+</html>

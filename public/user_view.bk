@@ -27,18 +27,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ssss", $link, $name, $email, $phone);
     $stmt->execute();
     $stmt->close();
+    
+    // Sending data to admin view via socket (simplified)
+    // $socket = fsockopen("127.0.0.1", 12345);
+    // fwrite($socket, json_encode(['link' => $link, 'name' => $name, 'email' => $email, 'phone' => $phone]));
+    // fclose($socket);
 
-    // Send data to socket server
-    $host="0.0.0.0";
     $port=12345;
-    $socket=socket_create(AF_INET,SOCK_STREAM,0) or die('Not Created');
-    socket_connect($socket,$host,$port) or die('Not connect');
-    $msg='{ "link": "'.$link.'", "name": "'.$name.'", "email": "'.$email.'", "phone": "'.$phone.'" }';
-    socket_write($socket,$msg,strlen($msg));
-    socket_close($socket);
-
+	$socket=socket_create(AF_INET,SOCK_STREAM,0) or die('Not Created');
+	socket_connect($socket,$host,$port) or die('Not connect');
+	$msg=$_POST['msg'];
+	socket_write($socket,$msg,strlen($msg));
+    
     echo "Thank you for your submission!";
 }
+
 ?>
 
 <!DOCTYPE html>

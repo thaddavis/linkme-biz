@@ -1,0 +1,27 @@
+<?php
+$host="0.0.0.0";
+$port=12345;
+$socket=socket_create(AF_INET,SOCK_STREAM,0) or die('Not Created');
+$result=socket_bind($socket,$host,$port) or die('Not bind');
+$result=socket_listen($socket,3) or die('Not listen');
+
+do{
+    echo "Waiting for data ... \n";
+
+    $accept=socket_accept($socket) or die('Not accept');
+
+    echo "1... \n";
+
+    $msg=socket_read($accept,1024);
+
+    echo "2... \n";
+
+    $msg=trim($msg);
+
+    echo "3... \n";
+
+    echo $msg."\n";
+}while(true);
+
+//socket_close($accept,$socket);
+?>

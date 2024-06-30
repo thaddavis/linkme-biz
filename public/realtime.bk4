@@ -1,0 +1,59 @@
+<?php
+// realtime.php
+
+// Set up the socket server connection details
+$host = "127.0.0.1";  // The server address
+$port = 12345;        // The server port
+
+// Create a WebSocket connection
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\n");
+socket_connect($socket, $host, $port) or die("Could not connect to server\n");
+
+// Array to hold received messages
+$messages = [];
+
+while (true) {
+    // Read messages from the server
+    $input = @socket_read($socket, 1024, PHP_NORMAL_READ);
+    if ($input !== false && !empty(trim($input))) {
+        $messages[] = trim($input);
+    }
+
+    // Clear the input buffer
+    ob_flush();
+    flush();
+
+    // Display received messages
+    foreach ($messages as $message) {
+        echo $message . "<br>";
+    }
+
+    // Wait before checking for new messages
+    usleep(100000);
+}
+
+// Close the socket connection
+socket_close($socket);
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-time Messages</title>
+</head>
+<body>
+    <h1>Real-time Messages</h1>
+    <div id="messages"></div>
+
+    <script>
+        // Use AJAX to periodically fetch new messages
+        setInterval(function() {
+            fetch('realtime.php')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('messages').innerHTML = data;
+                });
+        }, 1000); // Fetch every second
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $message = $_POST['message'];
+    echo "!-!-!";
+    echo "Message received: $message";
+    // Here you can process the message as needed
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Message Receiver</title>
+</head>
+<body>
+    <h1>Message Receiver</h1>
+    <p><?php echo isset($message) ? $message : 'No message received.'; ?></p>
+</body>
+</html>

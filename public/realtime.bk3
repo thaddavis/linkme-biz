@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket Message Stream</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #messages {
+            border: 1px solid #000;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+    <h1>Messages</h1>
+    <div id="messages"></div>
+
+    <script>
+        $(document).ready(function() {
+            function fetchMessages() {
+                $.ajax({
+                    url: 'fetch_messages.php',
+                    success: function(data) {
+                        if(data) {
+                            $('#messages').append('<p>' + data + '</p>');
+                            $('#messages').scrollTop($('#messages')[0].scrollHeight); // Auto scroll to the bottom
+                        }
+                    },
+                    complete: function() {
+                        setTimeout(fetchMessages, 1000); // Poll every 1 second
+                    }
+                });
+            }
+
+            fetchMessages();
+        });
+    </script>
+</body>
+</html>

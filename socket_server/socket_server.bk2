@@ -1,0 +1,149 @@
+<?php
+set_time_limit(0);
+
+$host = '127.0.0.1';
+$port = 12345;
+$null = NULL;
+
+$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+if ($socket === false) {
+    error_log("socket_create() failed: reason: " . socket_strerror(socket_last_error()));
+    exit();
+}
+
+socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
+if (socket_bind($socket, $host, $port) === false) {
+    error_log("socket_bind() failed: reason: " . socket_strerror(socket_last_error($socket)));
+    exit();
+}
+
+if (socket_listen($socket, 5) === false) {
+    error_log("socket_listen() failed: reason: " . socket_strerror(socket_last_error($socket)));
+    exit();
+}
+
+$clients = [$socket];
+
+function send_message($msg) {
+    global $clients, $socket;
+    foreach ($clients as $client) {
+        if ($client != $socket && is_resource($client)) {
+            socket_write($client, $msg, strlen($msg));
+        }
+    }
+}
+
+while (true) {
+    $changed = $clients;
+    socket_select($changed, $null, $null, 0, 10);
+
+    if (in_array($socket, $changed)) {
+        $socket_new = socket_accept($socket);
+        if ($socket_new === false) {
+            error_log("socket_accept() failed: reason: " . socket_strerror(socket_last_error($socket)));
+            continue;
+        }
+        $clients[] = $socket_new;
+        error_log("New connection accepted");
+
+        $header = socket_read($socket_new, 1024);
+        if ($header) {
+            error_log("Header received: " . $header);
+            perform_handshaking($header, $socket_new, $host, $port);
+
+            if (@socket_getpeername($socket_new, $ip)) {
+                $response = mask(json_encode(['type' => 'system', 'message' => "$ip connected"]));
+                send_message($response);
+            }
+        } else {
+            error_log("No header received");
+        }
+
+        $found_socket = array_search($socket, $changed);
+        unset($changed[$found_socket]);
+    }
+
+    foreach ($changed as $changed_socket) {
+        while (socket_recv($changed_socket, $buf, 1024, 0) >= 1) {
+            $received_text = unmask($buf);
+            $msg = json_encode(['type' => 'message', 'text' => $received_text]);
+            send_message(mask($msg));
+            break 2;
+        }
+
+        $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
+        if ($buf === false) {
+            $found_socket = array_search($changed_socket, $clients);
+            if ($found_socket !== false) {
+                if (@socket_getpeername($changed_socket, $ip)) {
+                    $response = mask(json_encode(['type' => 'system', 'message' => "$ip disconnected"]));
+                    send_message($response);
+                }
+                unset($clients[$found_socket]);
+                socket_close($changed_socket);
+            }
+        }
+    }
+}
+
+socket_close($socket);
+
+function perform_handshaking($received_header, $client_conn, $host, $port) {
+    $headers = [];
+    $lines = preg_split("/\r\n/", $received_header);
+    foreach ($lines as $line) {
+        $line = chop($line);
+        if (preg_match('/\A(\S+): (.*)\z/', $line, $matches)) {
+            $headers[$matches[1]] = $matches[2];
+        }
+    }
+
+    if (!isset($headers['Sec-WebSocket-Key'])) {
+        error_log("Sec-WebSocket-Key missing in header");
+        return;
+    }
+
+    $secKey = $headers['Sec-WebSocket-Key'];
+    $secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
+
+    $upgrade = "HTTP/1.1 101 Switching Protocols\r\n" .
+               "Upgrade: websocket\r\n" .
+               "Connection: Upgrade\r\n" .
+               "Sec-WebSocket-Accept: $secAccept\r\n\r\n";
+    socket_write($client_conn, $upgrade, strlen($upgrade));
+    error_log("Handshake sent to client");
+}
+
+function unmask($text) {
+    $length = ord($text[1]) & 127;
+    if ($length == 126) {
+        $masks = substr($text, 4, 4);
+        $data = substr($text, 8);
+    } elseif ($length == 127) {
+        $masks = substr($text, 10, 4);
+        $data = substr($text, 14);
+    } else {
+        $masks = substr($text, 2, 4);
+        $data = substr($text, 6);
+    }
+    $text = '';
+    for ($i = 0; $i < strlen($data); ++$i) {
+        $text .= $data[$i] ^ $masks[$i % 4];
+    }
+    return $text;
+}
+
+function mask($text) {
+    $b1 = 0x80 | (0x1 & 0x0f);
+    $length = strlen($text);
+
+    if ($length <= 125) {
+        $header = pack('CC', $b1, $length);
+    } elseif ($length >= 126 && $length <= 65535) {
+        $header = pack('CCn', $b1, 126, $length);
+    } else {
+        $header = pack('CCNN', $b1, 127, $length);
+    }
+    return $header . $text;
+}
+?>

@@ -45,7 +45,7 @@ while (true) {
     // Handle communication with existing clients
     foreach ($read as $client_socket) {
         $input = @socket_read($client_socket, 1024, PHP_NORMAL_READ);
-        if ($input === false || $input === "") {
+        if ($input === false) {
             // Remove client from the list and close the socket
             unset($clients[array_search($client_socket, $clients)]);
             socket_close($client_socket);
@@ -58,16 +58,22 @@ while (true) {
         if (!empty($input)) {
             echo "Received message: $input\n";
             // Broadcast the message to all clients except the sender and the server socket
+
+            echo "Broadcasting message to clients...\n";
+
+            // Broadcast the message to all clients except the sender and the server socket
             foreach ($clients as $send_socket) {
-                if ($send_socket != $socket && $send_socket != $client_socket) {
-                    $write_result = @socket_write($send_socket, $input, strlen($input));
-                    if ($write_result === false) {
-                        // Remove client from the list and close the socket
-                        unset($clients[array_search($send_socket, $clients)]);
-                        socket_close($send_socket);
-                        echo "Client disconnected due to write error.\n";
-                    }
-                }
+              echo "=>\n";
+
+              if ($send_socket != $socket && $send_socket != $client_socket) {
+                  $write_result = @socket_write($send_socket, $input, strlen($input));
+                  if ($write_result === false) {
+                      // Remove client from the list and close the socket
+                      unset($clients[array_search($send_socket, $clients)]);
+                      socket_close($send_socket);
+                      echo "Client disconnected due to write error.\n";
+                  }
+              }
             }
         }
     }

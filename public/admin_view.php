@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
+$servername = "db";
+$username = "user";
+$password = "password";
 $dbname = "link_generator";
 
 $conn = new mysqli($servername, $username, $password, $dbname);

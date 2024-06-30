@@ -1,4 +1,4 @@
-CREATE DATABASE link_generator;
+-- CREATE DATABASE link_generator;
 
 USE link_generator;
 

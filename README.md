@@ -12,7 +12,7 @@ Repo holding the code for Tad's linkme-biz-interview
 
 ## Running the php server
 
-- php -S localhost:8000 -t public
+- php -S 0.0.0.0:8000 -t public
 
 ## Print location of php.ini file
 
@@ -20,3 +20,13 @@ Repo holding the code for Tad's linkme-biz-interview
   - Configuration File (php.ini) Path: /usr/local/etc/php
 
 ## installing mysql
+
+- uncommented line #950 in `/usr/local/etc/php/php.ini-production` and restarted php server
+
+## Running development containers with Docker Compose
+
+- docker-compose -f docker-compose.yml up
+
+## Running in linkme network
+
+- docker network create linkme

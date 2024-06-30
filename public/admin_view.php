@@ -34,9 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Active Links</h2>
     <ul>
     <?php
-    $result = $conn->query("SELECT * FROM links");
+    $query = "
+        SELECT links.id, links.link, 
+               COUNT(DISTINCT submissions.id) AS submission_count,
+               COUNT(DISTINCT link_access_logs.id) AS access_count
+        FROM links
+        LEFT JOIN submissions ON links.id = submissions.link_id
+        LEFT JOIN link_access_logs ON links.id = link_access_logs.link_id
+        GROUP BY links.id, links.link
+    ";
+    $result = $conn->query($query);
+
     while ($row = $result->fetch_assoc()) {
-        echo "<li><a href='user_view.php?link=" . $row['link'] . "'>" . $row['link'] . "</a></li>";
+        echo "<li><a href='user_view.php?link=" . $row['link'] . "'>" . $row['link'] . "</a> - Submissions: " . $row['submission_count'] . " - Accesses: " . $row['access_count'] . "</li>";
     }
     $conn->close();
     ?>

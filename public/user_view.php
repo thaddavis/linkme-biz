@@ -12,6 +12,12 @@ if ($conn->connect_error) {
 
 $link = $_GET['link'];
 
+// Log link access
+$stmt = $conn->prepare("INSERT INTO link_access_logs (link_id) VALUES ((SELECT id FROM links WHERE link=?))");
+$stmt->bind_param("s", $link);
+$stmt->execute();
+$stmt->close();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
@@ -23,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
     
     // Sending data to admin view via socket (simplified)
-    $socket = fsockopen("localhost", 12345);
+    $socket = fsockopen("127.0.0.1", 12345);
     fwrite($socket, json_encode(['link' => $link, 'name' => $name, 'email' => $email, 'phone' => $phone]));
     fclose($socket);
     

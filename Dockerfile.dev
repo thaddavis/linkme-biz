@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     default-mysql-client
 
 # Install PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN docker-php-ext-install mysqli pdo pdo_mysql sockets
 
 # Copy the production php.ini file to the active configuration file
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini

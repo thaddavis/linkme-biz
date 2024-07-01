@@ -1,17 +1,9 @@
-<?php
-
-function say($what)
-{
-    echo $what;
-}
-
-?>
-
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Linkme Challenge</title>
+    <title>Linkme</title>
 </head>
 <body>
-    <?php say("Hello Linkme Business!"); ?>
+    <h1>Welcome to Linkme</h1>
 </body>
 </html>

@@ -79,12 +79,13 @@ while (true) {
             if ($decoded_message) {
                 if (isset($decoded_message['text'])) {
                     echo "message: " . $decoded_message['text'] . "\n";
-                    // if ($decoded_message['type'] === 'join') {
-                    //     $members[$key] = [
-                    //         'name' => $decoded_message['sender'],
-                    //         'connection' => $value
-                    //     ];
-                    // }
+                    if ($decoded_message['type'] === 'join') {
+                        $members[$key] = [
+                            // 'name' => $decoded_message['link_id'],
+                            'name' => "default",
+                            'connection' => $value
+                        ];
+                    }
                     $maskedMessage = pack_data($message);
 
                     echo '$members ' . json_encode($members) . "\n";

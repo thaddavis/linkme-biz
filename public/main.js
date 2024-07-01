@@ -102,12 +102,6 @@
 
   var socketOpen = (e) => {
       console.log("connected to the socket");
-    //   var msg = {
-    //       type: 'join',
-    //       sender: 'Browser',
-    //       text: 'connected to the chat server'
-    //   }
-    //   appendMessage(JSON.stringify(msg));
       setup();
   }
 

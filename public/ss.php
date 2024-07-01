@@ -77,9 +77,12 @@ while (true) {
             $message = unmask($data);
             $decoded_message = json_decode($message, true);
             if ($decoded_message) {
-                if (isset($decoded_message['text'])) {
-                    echo "message: " . $decoded_message['text'] . "\n";
+                if (isset($decoded_message['data'])) {
+                    echo "data: " . $decoded_message['data'] . "\n";
                     if ($decoded_message['type'] === 'join') {
+
+                        echo "\nJoining...\n";
+
                         $members[$key] = [
                             // 'name' => $decoded_message['link_id'],
                             'name' => "default",
@@ -104,7 +107,7 @@ while (true) {
                 $message = [
                     "type" => "left",
                     "sender" => "Server",
-                    "text" => $members[$key]['name'] . " left the chat\n"
+                    "data" => ""
                 ];
                 $maskedMessage = pack_data(json_encode($message));
                 unset($members[$key]);

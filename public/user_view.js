@@ -5,64 +5,43 @@
   }
 
   function setup() {
-      // var sender = '';
       var userViewForm = document.querySelector('form');
-      // var msgForm = document.querySelector('form.msg-form');
-      // var closeForm = document.querySelector('form.close-form');
-  
+      
       function formSubmit(event) {
           console.log('formSubmit');
+          console.log('event')
+          // event.preventDefault();
 
-          // debugger;
-          event.preventDefault();
-          // sender = document.getElementById('sender').value;
+          const queryString = window.location.search;
+          console.log('queryString', queryString);
+          const urlParams = new URLSearchParams(queryString);
+          const link = urlParams.get("link")
+
+          const name = document.getElementById('name').value;
+          const email = document.getElementById('email').value;
+          const phone = document.getElementById('phone').value;
+          
           var userViewSubmitMsg = {
               type: "submission",
-              // sender: sender,
-              text: 'User View Form Submitted'
+              streamId: link,
+              data: JSON.stringify({name, email, phone})
           };
 
           msg = JSON.stringify(userViewSubmitMsg);
           sendMessage(msg);
-          // msgField.value = ''; // TODO
       }
   
       userViewForm.addEventListener('submit', formSubmit);
-  
-      // function msgFormSubmit(event) {
-      //     event.preventDefault();
-      //     var msgField, msgText, msg;
-      //     msgField = document.getElementById('msg');
-      //     msgText = msgField.value;
-      //     msg = {
-      //         type: "normal",
-      //         sender: sender,
-      //         text: msgText
-      //     };
-      //     msg = JSON.stringify(msg);
-      //     sendMessage(msg);
-      //     msgField.value = '';
-      // }
-  
-      // msgForm.addEventListener('submit', msgFormSubmit);
-
-      // function closeFormSubmit(event) {
-      //     event.preventDefault();
-      //     socket.close();
-      //     window.location.reload();
-      // }
-
-      // closeForm.addEventListener('submit', closeFormSubmit);
   }
 
-  let socket = new WebSocket("ws://localhost:8910");
+  let socket = new WebSocket("ws://127.0.0.1:8910");
 
   var socketOpen = (e) => {
       console.log("connected to the socket");
       var msg = {
           type: 'join',
           sender: 'Browser',
-          text: 'connected to the chat server'
+          data: 'connected'
       }
       sendMessage(JSON.stringify(msg));
       setup();
@@ -91,7 +70,6 @@
               text: 'The connection closed for some reason'
           }
       }
-      appendMessage(JSON.stringify(msg));
   }
   
   var socketError = (e) => {

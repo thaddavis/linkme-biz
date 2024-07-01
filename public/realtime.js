@@ -4,7 +4,7 @@
   }
 
   function parseMessage(message) {
-      var msg = {type: "", sender: "", text: ""};
+      var msg = {type: "", sender: "", data: ""};
       try {
           msg = JSON.parse(message);
       }
@@ -15,39 +15,19 @@
   }
 
   function appendMessage(message) {
-
-      debugger
-      
       var parsedMsg;
       var msgContainer = document.querySelector(".messages");
       if (parsedMsg = parseMessage(message)) {
           console.log('appending message');
           console.log(parsedMsg);
 
-          var msgElem, senderElem, textElem;
-          var sender, text;
+          var msgElem, textElem;
+          var text;
 
           msgElem = document.createElement("div");
-          msgElem.classList.add('msg');
-          msgElem.classList.add('msg-' + parsedMsg.type);
-
-          senderElem = document.createElement("span");
-          senderElem.classList.add("msg-sender");
-
-          textElem = document.createElement("span");
-          textElem.classList.add("msg-text");
-
-          sender = document.createTextNode(parsedMsg.sender + ': ');
-          text = document.createTextNode(parsedMsg.text);
-
-          console.log(sender);
           
-          senderElem.appendChild(sender);
-          textElem.appendChild(text);
-
-          msgElem.appendChild(senderElem);
-          msgElem.appendChild(textElem);
-
+          text = document.createTextNode(message);
+          msgElem.appendChild(text);
           msgContainer.appendChild(msgElem);
       }
   }
@@ -64,18 +44,12 @@
           var joinMsg = {
               type: "join",
               sender: sender,
-              text: sender + ' joined the chat!'
+              data: sender + ' joined the chat!'
           };
           sendMessage(JSON.stringify(joinMsg));
           joinForm.classList.add('hidden');
           msgForm.classList.remove('hidden');
           closeForm.classList.remove('hidden');
-      }
-  
-      function closeFormSubmit(event) {
-          event.preventDefault();
-          socket.close();
-          window.location.reload();
       }
   }
 
@@ -86,7 +60,7 @@
       var msg = {
           type: 'join',
           sender: 'Browser',
-          text: 'connected to the chat server'
+          data: 'connected'
       }
       sendMessage(JSON.stringify(msg));
       setup();
@@ -105,7 +79,7 @@
           msg = {
               type: 'left',
               sender: 'Browser',
-              text: 'The connection closed cleanly'
+              data: 'The connection closed cleanly'
           }
       }
       else {
@@ -113,7 +87,7 @@
           var msg = {
               type: 'left',
               sender: 'Browser',
-              text: 'The connection closed for some reason'
+              data: 'The connection closed for some reason'
           }
       }
       appendMessage(JSON.stringify(msg));

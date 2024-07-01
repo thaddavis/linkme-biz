@@ -6,12 +6,12 @@
 
   function setup() {
       var userViewForm = document.querySelector('form');
+
+
       
       function formSubmit(event) {
           console.log('formSubmit');
-          console.log('event')
-          // event.preventDefault();
-
+          
           const queryString = window.location.search;
           console.log('queryString', queryString);
           const urlParams = new URLSearchParams(queryString);
@@ -32,6 +32,44 @@
       }
   
       userViewForm.addEventListener('submit', formSubmit);
+
+      function handleInputChange(event) {
+        const fieldName = event.target.id;
+        const fieldValue = event.target.value;
+        
+        const queryString = window.location.search;
+        console.log('queryString', queryString);
+        const urlParams = new URLSearchParams(queryString);
+        const link = urlParams.get("link")
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        
+        var userViewSubmitMsg = {
+            type: "submission",
+            streamId: link,
+            data: JSON.stringify({
+                name,
+                email,
+                phone,
+                [fieldName]: fieldValue
+            })
+        };
+
+        msg = JSON.stringify(userViewSubmitMsg);
+        sendMessage(msg);
+
+        msg = JSON.stringify(inputChangeMsg);
+        sendMessage(msg);
+      }
+
+      document.getElementById('name').addEventListener('change', handleInputChange);
+      document.getElementById('email').addEventListener('change', handleInputChange);
+      document.getElementById('phone').addEventListener('change', handleInputChange);
+      document.getElementById('name').addEventListener('input', handleInputChange);
+      document.getElementById('email').addEventListener('input', handleInputChange);
+      document.getElementById('phone').addEventListener('input', handleInputChange);
   }
 
   let socket = new WebSocket("ws://127.0.0.1:8910");
